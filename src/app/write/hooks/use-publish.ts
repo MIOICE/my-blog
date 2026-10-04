@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useRef } from 'react'
 import { readFileAsText } from '@/lib/file-utils'
 import { toast } from 'sonner'
 import { pushBlog } from '../services/push-blog'
@@ -7,6 +7,7 @@ import { useWriteStore } from '../stores/write-store'
 import { useAuthStore } from '@/hooks/use-auth'
 
 export function usePublish() {
+	const operationRef = useRef(false)
 	const { loading, setLoading, form, cover, images, mode, originalSlug } = useWriteStore()
 	const { isAuth, setPrivateKey } = useAuthStore()
 
@@ -19,6 +20,8 @@ export function usePublish() {
 	)
 
 	const onPublish = useCallback(async () => {
+		if (operationRef.current) return
+		operationRef.current = true
 		try {
 			let publishForm = form
 			if (mode === 'edit' && form.source === 'obsidian') {
@@ -41,16 +44,19 @@ export function usePublish() {
 			console.error(err)
 			toast.error(err?.message || '操作失败')
 		} finally {
+			operationRef.current = false
 			setLoading(false)
 		}
 	}, [form, cover, images, mode, originalSlug, setLoading])
 
 	const onDelete = useCallback(async () => {
+		if (operationRef.current) return
 		const targetSlug = originalSlug || form.slug
 		if (!targetSlug) {
 			toast.error('缺少 slug，无法删除')
 			return
 		}
+		operationRef.current = true
 		try {
 			setLoading(true)
 			await deleteBlog(targetSlug)
@@ -58,6 +64,7 @@ export function usePublish() {
 			console.error(err)
 			toast.error(err?.message || '删除失败')
 		} finally {
+			operationRef.current = false
 			setLoading(false)
 		}
 	}, [form.slug, originalSlug, setLoading])

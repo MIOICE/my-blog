@@ -2,7 +2,6 @@
 
 import { useAuthStore } from '@/hooks/use-auth'
 import { KJUR, KEYUTIL } from 'jsrsasign'
-import { toast } from 'sonner'
 
 export const GH_API = 'https://api.github.com'
 
@@ -15,8 +14,10 @@ function handle401Error(): void {
 	}
 }
 
-function handle422Error(): void {
-	toast.error('GitHub 拒绝了提交内容，请查看具体错误')
+async function githubRequestError(res: Response, action: string): Promise<Error> {
+	const detail = await res.json().catch(() => null)
+	const message = typeof detail?.message === 'string' ? `：${detail.message}` : ''
+	return new Error(`${action}失败（GitHub ${res.status}）${message}`)
 }
 
 export function toBase64Utf8(input: string): string {
@@ -40,8 +41,7 @@ export async function getInstallationId(jwt: string, owner: string, repo: string
 		}
 	})
 	if (res.status === 401) handle401Error()
-	if (res.status === 422) handle422Error()
-	if (!res.ok) throw new Error(`installation lookup failed: ${res.status}`)
+	if (!res.ok) throw await githubRequestError(res, '查找 GitHub App 安装信息')
 	const data = await res.json()
 	return data.id
 }
@@ -56,8 +56,7 @@ export async function createInstallationToken(jwt: string, installationId: numbe
 		}
 	})
 	if (res.status === 401) handle401Error()
-	if (res.status === 422) handle422Error()
-	if (!res.ok) throw new Error(`create token failed: ${res.status}`)
+	if (!res.ok) throw await githubRequestError(res, '创建 GitHub 访问令牌')
 	const data = await res.json()
 	return data.token as string
 }
@@ -71,9 +70,8 @@ export async function getFileSha(token: string, owner: string, repo: string, pat
 		}
 	})
 	if (res.status === 401) handle401Error()
-	if (res.status === 422) handle422Error()
 	if (res.status === 404) return undefined
-	if (!res.ok) throw new Error(`get file sha failed: ${res.status}`)
+	if (!res.ok) throw await githubRequestError(res, '读取文件版本')
 	const data = await res.json()
 	return (data && data.sha) || undefined
 }
@@ -91,8 +89,7 @@ export async function putFile(token: string, owner: string, repo: string, path: 
 		body: JSON.stringify({ message, content: contentBase64, branch, ...(sha ? { sha } : {}) })
 	})
 	if (res.status === 401) handle401Error()
-	if (res.status === 422) handle422Error()
-	if (!res.ok) throw new Error(`put file failed: ${res.status}`)
+	if (!res.ok) throw await githubRequestError(res, '写入文件')
 	return res.json()
 }
 
@@ -107,8 +104,7 @@ export async function getRef(token: string, owner: string, repo: string, ref: st
 		}
 	})
 	if (res.status === 401) handle401Error()
-	if (res.status === 422) handle422Error()
-	if (!res.ok) throw new Error(`get ref failed: ${res.status}`)
+	if (!res.ok) throw await githubRequestError(res, '读取分支')
 	const data = await res.json()
 	const commitSha = data.object.sha as string
 	const commitRes = await fetch(`${GH_API}/repos/${owner}/${repo}/git/commits/${commitSha}`, {
@@ -119,7 +115,7 @@ export async function getRef(token: string, owner: string, repo: string, ref: st
 		}
 	})
 	if (commitRes.status === 401) handle401Error()
-	if (!commitRes.ok) throw new Error(`get commit failed: ${commitRes.status}`)
+	if (!commitRes.ok) throw await githubRequestError(commitRes, '读取分支提交')
 	const commit = await commitRes.json()
 	return { sha: commitSha, treeSha: commit.tree.sha }
 }
@@ -144,11 +140,7 @@ export async function createTree(token: string, owner: string, repo: string, tre
 		body: JSON.stringify({ tree, base_tree: baseTree })
 	})
 	if (res.status === 401) handle401Error()
-	if (res.status === 422) handle422Error()
-	if (!res.ok) {
-		const detail = await res.json().catch(() => null)
-		throw new Error(`create tree failed: ${res.status}${detail?.message ? ` ${detail.message}` : ''}`)
-	}
+	if (!res.ok) throw await githubRequestError(res, '创建文件树')
 	const data = await res.json()
 	return { sha: data.sha }
 }
@@ -165,8 +157,7 @@ export async function createCommit(token: string, owner: string, repo: string, m
 		body: JSON.stringify({ message, tree, parents })
 	})
 	if (res.status === 401) handle401Error()
-	if (res.status === 422) handle422Error()
-	if (!res.ok) throw new Error(`create commit failed: ${res.status}`)
+	if (!res.ok) throw await githubRequestError(res, '创建提交')
 	const data = await res.json()
 	return { sha: data.sha }
 }
@@ -183,11 +174,7 @@ export async function updateRef(token: string, owner: string, repo: string, ref:
 		body: JSON.stringify({ sha, force })
 	})
 	if (res.status === 401) handle401Error()
-	if (res.status === 422) handle422Error()
-	if (!res.ok) {
-		const detail = await res.json().catch(() => null)
-		throw new Error(`update ref failed: ${res.status}${detail?.message ? ` ${detail.message}` : ''}`)
-	}
+	if (!res.ok) throw await githubRequestError(res, '更新分支')
 }
 
 export async function readTextFileFromRepo(token: string, owner: string, repo: string, path: string, ref: string): Promise<string | null> {
@@ -199,9 +186,8 @@ export async function readTextFileFromRepo(token: string, owner: string, repo: s
 		}
 	})
 	if (res.status === 401) handle401Error()
-	if (res.status === 422) handle422Error()
 	if (res.status === 404) return null
-	if (!res.ok) throw new Error(`read file failed: ${res.status}`)
+	if (!res.ok) throw await githubRequestError(res, '读取文件')
 	const data: any = await res.json()
 	if (Array.isArray(data) || !data.content) return null
 	try {
@@ -221,9 +207,8 @@ export async function listRepoFilesRecursive(token: string, owner: string, repo:
 			}
 		})
 		if (res.status === 401) handle401Error()
-		if (res.status === 422) handle422Error()
 		if (res.status === 404) return []
-		if (!res.ok) throw new Error(`read directory failed: ${res.status}`)
+		if (!res.ok) throw await githubRequestError(res, '读取目录')
 		const data: any = await res.json()
 		if (Array.isArray(data)) {
 			const files: string[] = []
@@ -263,8 +248,7 @@ export async function createBlob(
 		body: JSON.stringify({ content, encoding })
 	})
 	if (res.status === 401) handle401Error()
-	if (res.status === 422) handle422Error()
-	if (!res.ok) throw new Error(`create blob failed: ${res.status}`)
+	if (!res.ok) throw await githubRequestError(res, '上传图片')
 	const data = await res.json()
 	return { sha: data.sha }
 }
