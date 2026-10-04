@@ -9,7 +9,8 @@
     "date": "2026-09-30T09:10",
     "summary": "笔记的价值不在于保存了多少文字，而在于未来能否恢复当时的理解并继续行动。",
     "hidden": false,
-    "category": "随笔"
+    "category": "随笔",
+    "source": "obsidian"
   },
   {
     "slug": "learning-by-explanation",
@@ -21,6 +22,7 @@
     "date": "2026-09-30T09:00",
     "summary": "用自己的语言解释知识，通过卡顿和含糊之处定位真正的理解缺口。",
     "hidden": false,
-    "category": "学习笔记"
+    "category": "学习笔记",
+    "source": "obsidian"
   }
 ]
