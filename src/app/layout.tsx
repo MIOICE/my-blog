@@ -24,6 +24,7 @@ export const metadata: Metadata = {
 }
 
 const htmlStyle = {
+	minHeight: '100%',
 	'--color-brand': theme.colorBrand,
 	'--color-primary': theme.colorPrimary,
 	'--color-secondary': theme.colorSecondary,

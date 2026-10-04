@@ -19,7 +19,12 @@
 		"#ece6dc",
 		"#f8f7f3"
 	],
-	"artImages": [],
+	"artImages": [
+		{
+			"id": "quiet-lines",
+			"url": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 500'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop stop-color='%23e6eee9'/%3E%3Cstop offset='1' stop-color='%23f2e9dc'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='800' height='500' fill='url(%23g)'/%3E%3Cpath d='M70 370 C220 170 350 430 520 210 S760 170 800 130' fill='none' stroke='%237f9c94' stroke-opacity='.42' stroke-width='3'/%3E%3Ccircle cx='620' cy='120' r='48' fill='%23fff' fill-opacity='.5'/%3E%3C/svg%3E"
+		}
+	],
 	"currentArtImageId": "",
 	"backgroundImages": [
 		{
@@ -28,7 +33,15 @@
 		}
 	],
 	"currentBackgroundImageId": "",
-	"socialButtons": [],
+	"socialButtons": [
+		{
+			"id": "articles",
+			"type": "link",
+			"value": "/blog",
+			"label": "文章",
+			"order": 1
+		}
+	],
 	"clockShowSeconds": false,
 	"summaryInContent": false,
 	"isCachePem": false,
