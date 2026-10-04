@@ -6,10 +6,12 @@ import { PropsWithChildren, useState } from 'react'
 import { Toaster } from 'sonner'
 import { useAuthStore } from '@/hooks/use-auth'
 import ProfileEditor from '@/components/profile-editor'
+import { useConfigStore } from '@/app/(home)/stores/config-store'
 
 export default function Layout({ children }: PropsWithChildren) {
 	const pathname = usePathname()
 	const { isAuth } = useAuthStore()
+	const { siteContent } = useConfigStore()
 	const [profileOpen, setProfileOpen] = useState(false)
 	const nav = [
 		{ href: '/', label: '首页' },
@@ -23,7 +25,7 @@ export default function Layout({ children }: PropsWithChildren) {
 				<div className='mx-auto flex max-w-6xl items-center justify-between px-6 py-4'>
 					<Link href='/' className='flex items-center gap-3 font-medium tracking-[.08em]'>
 						<span className='grid size-9 place-items-center rounded-full border border-[#7f9c94]/30 bg-white/60 font-serif text-sm'>知</span>
-						<span>知识与感悟</span>
+						<span>{siteContent.meta.title}</span>
 					</Link>
 					<nav className='flex items-center gap-1 rounded-full border border-black/5 bg-white/45 p-1 text-sm'>
 						{nav.map(item => <Link key={item.href} href={item.href} className={`rounded-full px-4 py-2 transition ${pathname === item.href ? 'bg-white text-[#35413e] shadow-sm' : 'text-[#7b8884] hover:text-[#35413e]'}`}>{item.label}</Link>)}
