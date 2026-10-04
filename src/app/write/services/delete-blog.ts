@@ -12,6 +12,7 @@ export async function deleteBlog(slug: string): Promise<void> {
 	toast.info('正在获取分支信息...')
 	const refData = await getRef(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, `heads/${GITHUB_CONFIG.BRANCH}`)
 	const latestCommitSha = refData.sha
+	const baseTreeSha = refData.treeSha
 
 	const basePath = `public/blogs/${slug}`
 
@@ -39,7 +40,7 @@ export async function deleteBlog(slug: string): Promise<void> {
 	})
 
 	toast.info('正在创建提交...')
-	const treeData = await createTree(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, treeItems, latestCommitSha)
+	const treeData = await createTree(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, treeItems, baseTreeSha)
 	const commitData = await createCommit(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, `删除文章: ${slug}`, treeData.sha, [latestCommitSha])
 
 	toast.info('正在更新分支...')

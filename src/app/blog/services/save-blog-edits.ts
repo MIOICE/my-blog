@@ -13,6 +13,7 @@ export async function saveBlogEdits(originalItems: BlogIndexItem[], nextItems: B
 	toast.info('正在获取分支信息...')
 	const refData = await getRef(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, `heads/${GITHUB_CONFIG.BRANCH}`)
 	const latestCommitSha = refData.sha
+	const baseTreeSha = refData.treeSha
 
 	const treeItems: TreeItem[] = []
 
@@ -54,7 +55,7 @@ export async function saveBlogEdits(originalItems: BlogIndexItem[], nextItems: B
 	})
 
 	toast.info('正在创建提交...')
-	const treeData = await createTree(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, treeItems, latestCommitSha)
+	const treeData = await createTree(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, treeItems, baseTreeSha)
 	const actionLabels: string[] = []
 	if (uniqueRemoved.length > 0) {
 		actionLabels.push(`删除:${uniqueRemoved.join(',')}`)

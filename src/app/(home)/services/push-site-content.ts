@@ -22,7 +22,7 @@ export async function pushSiteContent(siteContent: SiteContent, avatarItem?: Fil
 	const configBlob = await createBlob(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, toBase64Utf8(config), 'base64')
 	treeItems.push({ path: 'src/config/site-content.json', mode: '100644', type: 'blob', sha: configBlob.sha })
 
-	const tree = await createTree(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, treeItems, refData.sha)
+	const tree = await createTree(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, treeItems, refData.treeSha)
 	const commit = await createCommit(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, '更新个人资料', tree.sha, [refData.sha])
 	await updateRef(token, GITHUB_CONFIG.OWNER, GITHUB_CONFIG.REPO, `heads/${GITHUB_CONFIG.BRANCH}`, commit.sha)
 	toast.success('个人资料已保存')

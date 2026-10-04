@@ -16,7 +16,7 @@ function handle401Error(): void {
 }
 
 function handle422Error(): void {
-	toast.error('操作太快了，请操作慢一点')
+	toast.error('GitHub 拒绝了提交内容，请查看具体错误')
 }
 
 export function toBase64Utf8(input: string): string {
@@ -98,7 +98,7 @@ export async function putFile(token: string, owner: string, repo: string, path: 
 
 // Batch commit APIs
 
-export async function getRef(token: string, owner: string, repo: string, ref: string): Promise<{ sha: string }> {
+export async function getRef(token: string, owner: string, repo: string, ref: string): Promise<{ sha: string; treeSha: string }> {
 	const res = await fetch(`${GH_API}/repos/${owner}/${repo}/git/ref/${encodeURIComponent(ref)}`, {
 		headers: {
 			Authorization: `Bearer ${token}`,
@@ -110,7 +110,18 @@ export async function getRef(token: string, owner: string, repo: string, ref: st
 	if (res.status === 422) handle422Error()
 	if (!res.ok) throw new Error(`get ref failed: ${res.status}`)
 	const data = await res.json()
-	return { sha: data.object.sha }
+	const commitSha = data.object.sha as string
+	const commitRes = await fetch(`${GH_API}/repos/${owner}/${repo}/git/commits/${commitSha}`, {
+		headers: {
+			Authorization: `Bearer ${token}`,
+			Accept: 'application/vnd.github+json',
+			'X-GitHub-Api-Version': '2022-11-28'
+		}
+	})
+	if (commitRes.status === 401) handle401Error()
+	if (!commitRes.ok) throw new Error(`get commit failed: ${commitRes.status}`)
+	const commit = await commitRes.json()
+	return { sha: commitSha, treeSha: commit.tree.sha }
 }
 
 export type TreeItem = {
@@ -134,7 +145,10 @@ export async function createTree(token: string, owner: string, repo: string, tre
 	})
 	if (res.status === 401) handle401Error()
 	if (res.status === 422) handle422Error()
-	if (!res.ok) throw new Error(`create tree failed: ${res.status}`)
+	if (!res.ok) {
+		const detail = await res.json().catch(() => null)
+		throw new Error(`create tree failed: ${res.status}${detail?.message ? ` ${detail.message}` : ''}`)
+	}
 	const data = await res.json()
 	return { sha: data.sha }
 }
