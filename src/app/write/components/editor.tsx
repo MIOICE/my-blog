@@ -160,8 +160,8 @@ export function WriteEditor() {
 			initial={{ opacity: 0, scale: 0.8 }}
 			animate={{ opacity: 1, scale: 1 }}
 			transition={{ delay: INIT_DELAY }}
-			className='bg-card flex min-h-[800px] w-[800px] flex-col rounded-[40px] border p-6 shadow'>
-			<div className='mb-3 flex gap-3'>
+			className='bg-card flex min-h-[70vh] min-w-0 flex-1 flex-col rounded-[28px] border p-4 shadow-sm sm:p-6'>
+			<div className='mb-3 flex flex-col gap-3 sm:flex-row'>
 				<input
 					type='text'
 					placeholder='标题'
@@ -172,7 +172,7 @@ export function WriteEditor() {
 				<input
 					type='text'
 					placeholder='slug（xx-xx）'
-					className='bg-card w-[200px] rounded-lg border px-3 py-2 text-sm'
+					className='bg-card w-full rounded-lg border px-3 py-2 text-sm sm:w-[200px]'
 					value={form.slug}
 					onChange={e => updateForm({ slug: e.target.value })}
 				/>

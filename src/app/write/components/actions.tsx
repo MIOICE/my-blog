@@ -81,7 +81,7 @@ export function WriteActions() {
 			/>
 			<input ref={mdInputRef} type='file' accept='.md' className='hidden' onChange={handleMdFileChange} />
 
-			<ul className='absolute top-4 right-6 flex items-center gap-2'>
+			<ul className='fixed right-4 bottom-4 left-4 z-30 flex flex-wrap items-center justify-end gap-2 rounded-2xl border border-black/5 bg-[#f5f4ef]/90 p-3 shadow-lg backdrop-blur-xl sm:left-auto'>
 				{mode === 'edit' && (
 					<>
 						<motion.div initial={{ opacity: 0, scale: 0.6 }} animate={{ opacity: 1, scale: 1 }} className='flex items-center gap-2'>

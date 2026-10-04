@@ -20,9 +20,15 @@ export function usePublish() {
 
 	const onPublish = useCallback(async () => {
 		try {
+			let publishForm = form
+			if (mode === 'edit' && form.source === 'obsidian') {
+				const takeover = window.confirm('这篇文章当前由 Obsidian 维护。继续保存将改为网页维护，本地发布器以后会跳过它。是否继续？')
+				if (!takeover) return
+				publishForm = { ...form, source: 'web' }
+			}
 			setLoading(true)
 			await pushBlog({
-				form,
+				form: publishForm,
 				cover,
 				images,
 				mode,

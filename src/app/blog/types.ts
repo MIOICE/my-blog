@@ -7,6 +7,7 @@ export type BlogIndexItem = {
 	cover?: string
 	hidden?: boolean
 	category?: string
+	source?: 'obsidian' | 'web'
 }
 
 export type BlogConfig = {
@@ -17,5 +18,6 @@ export type BlogConfig = {
 	cover?: string
 	hidden?: boolean
 	category?: string
+	source?: 'obsidian' | 'web'
 }
 

@@ -1,97 +1,40 @@
 'use client'
 
-import HiCard from '@/app/(home)/hi-card'
-import ArtCard from '@/app/(home)/art-card'
-import ClockCard from '@/app/(home)/clock-card'
-import CalendarCard from '@/app/(home)/calendar-card'
-import SocialButtons from '@/app/(home)/social-buttons'
-import ShareCard from '@/app/(home)/share-card'
-import AritcleCard from '@/app/(home)/aritcle-card'
-import WriteButtons from '@/app/(home)/write-buttons'
-import LikePosition from './like-position'
-import HatCard from './hat-card'
-import BeianCard from './beian-card'
-import { useSize } from '@/hooks/use-size'
-import { motion } from 'motion/react'
-import { useLayoutEditStore } from './stores/layout-edit-store'
+import Link from 'next/link'
+import dayjs from 'dayjs'
+import { useBlogIndex } from '@/hooks/use-blog-index'
 import { useConfigStore } from './stores/config-store'
-import { toast } from 'sonner'
-import ConfigDialog from './config-dialog/index'
-import { useEffect } from 'react'
-import SnowfallBackground from '@/layout/backgrounds/snowfall'
 
 export default function Home() {
-	const { maxSM } = useSize()
-	const { cardStyles, configDialogOpen, setConfigDialogOpen, siteContent } = useConfigStore()
-	const editing = useLayoutEditStore(state => state.editing)
-	const saveEditing = useLayoutEditStore(state => state.saveEditing)
-	const cancelEditing = useLayoutEditStore(state => state.cancelEditing)
-
-	const handleSave = () => {
-		saveEditing()
-		toast.success('首页布局偏移已保存（尚未提交到远程配置）')
-	}
-
-	const handleCancel = () => {
-		cancelEditing()
-		toast.info('已取消此次拖拽布局修改')
-	}
-
-	useEffect(() => {
-		const handleKeyDown = (e: KeyboardEvent) => {
-			if ((e.ctrlKey || e.metaKey) && (e.key === 'l' || e.key === ',')) {
-				e.preventDefault()
-				setConfigDialogOpen(true)
-			}
-		}
-
-		window.addEventListener('keydown', handleKeyDown)
-		return () => {
-			window.removeEventListener('keydown', handleKeyDown)
-		}
-	}, [setConfigDialogOpen])
-
+	const { siteContent } = useConfigStore()
+	const { items, loading } = useBlogIndex()
+	const latest = [...items].sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5)
+	const avatar = siteContent.meta.avatar || '/images/avatar.svg'
 	return (
-		<>
-			{siteContent.enableChristmas && <SnowfallBackground zIndex={0} count={!maxSM ? 125 : 20} />}
-
-			{editing && (
-				<div className='pointer-events-none fixed inset-x-0 top-0 z-50 flex justify-center pt-6'>
-					<div className='pointer-events-auto flex items-center gap-3 rounded-2xl bg-white/80 px-4 py-2 shadow-lg backdrop-blur'>
-						<span className='text-xs text-gray-600'>正在编辑首页布局，拖拽卡片调整位置</span>
-						<div className='flex gap-2'>
-							<motion.button
-								type='button'
-								whileHover={{ scale: 1.05 }}
-								whileTap={{ scale: 0.95 }}
-								onClick={handleCancel}
-								className='rounded-xl border bg-white px-3 py-1 text-xs font-medium text-gray-700'>
-								取消
-							</motion.button>
-							<motion.button type='button' whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleSave} className='brand-btn px-3 py-1 text-xs'>
-								保存偏移
-							</motion.button>
-						</div>
-					</div>
+		<div className='mx-auto grid max-w-6xl gap-16 px-6 py-20 lg:grid-cols-[320px_1fr] lg:py-28'>
+			<aside className='lg:sticky lg:top-32 lg:self-start'>
+				<img src={avatar} alt={siteContent.meta.username} className='size-24 rounded-full border border-white/80 object-cover shadow-[0_24px_60px_-30px_rgba(71,91,84,.5)]' />
+				<p className='mt-8 text-xs uppercase tracking-[.24em] text-[#8a9692]'>{siteContent.meta.title}</p>
+				<h1 className='mt-3 font-serif text-4xl leading-tight text-[#2f3b37]'>{siteContent.meta.username}</h1>
+				<p className='mt-6 text-[15px] leading-8 text-[#697772]'>{siteContent.meta.description}</p>
+				<div className='mt-8 flex flex-wrap gap-x-5 gap-y-2 text-sm text-[#657e76]'>
+					{[...siteContent.socialButtons].sort((a,b) => a.order-b.order).map(link => <a key={link.id} href={link.value} target={link.value.startsWith('http') ? '_blank' : undefined} rel='noreferrer' className='border-b border-[#7f9c94]/30 pb-1 hover:border-[#657e76]'>{link.label || link.type}</a>)}
 				</div>
-			)}
-
-			<div className='max-sm:flex max-sm:flex-col max-sm:items-center max-sm:gap-6 max-sm:pt-28 max-sm:pb-20'>
-				{cardStyles.artCard?.enabled !== false && <ArtCard />}
-				{cardStyles.hiCard?.enabled !== false && <HiCard />}
-				{!maxSM && cardStyles.clockCard?.enabled !== false && <ClockCard />}
-				{!maxSM && cardStyles.calendarCard?.enabled !== false && <CalendarCard />}
-				{cardStyles.socialButtons?.enabled !== false && <SocialButtons />}
-				{!maxSM && cardStyles.shareCard?.enabled !== false && <ShareCard />}
-				{cardStyles.articleCard?.enabled !== false && <AritcleCard />}
-				{!maxSM && cardStyles.writeButtons?.enabled !== false && <WriteButtons />}
-				{cardStyles.likePosition?.enabled !== false && <LikePosition />}
-				{cardStyles.hatCard?.enabled !== false && <HatCard />}
-				{cardStyles.beianCard?.enabled !== false && <BeianCard />}
-			</div>
-
-			{siteContent.enableChristmas && <SnowfallBackground zIndex={2} count={!maxSM ? 125 : 20} />}
-			<ConfigDialog open={configDialogOpen} onClose={() => setConfigDialogOpen(false)} />
-		</>
+			</aside>
+			<section>
+				<div className='flex items-end justify-between border-b border-[#7f9c94]/20 pb-5'>
+					<div><p className='text-xs uppercase tracking-[.24em] text-[#8a9692]'>Latest writing</p><h2 className='mt-2 font-serif text-3xl'>最近文章</h2></div>
+					<Link href='/blog' className='text-sm text-[#657e76]'>查看全部 →</Link>
+				</div>
+				<div className='divide-y divide-[#7f9c94]/15'>
+					{loading && <p className='py-12 text-sm text-[#8a9692]'>正在读取文章…</p>}
+					{latest.map(item => <Link key={item.slug} href={`/blog/${item.slug}`} className='group grid gap-3 py-8 sm:grid-cols-[110px_1fr]'>
+						<time className='text-sm text-[#98a39f]'>{dayjs(item.date).format('YYYY.MM.DD')}</time>
+						<div><h3 className='text-xl font-medium transition group-hover:text-[#657e76]'>{item.title}</h3>{item.summary && <p className='mt-3 line-clamp-2 leading-7 text-[#73807b]'>{item.summary}</p>}<p className='mt-4 text-xs tracking-wide text-[#93a09b]'>{item.category || '未分类'} · {item.tags.join(' / ')}</p></div>
+					</Link>)}
+					{!loading && latest.length === 0 && <p className='py-12 text-sm text-[#8a9692]'>还没有公开文章。</p>}
+				</div>
+			</section>
+		</div>
 	)
 }

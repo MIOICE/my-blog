@@ -55,6 +55,7 @@ const initialForm: PublishForm = {
 	summary: '',
 	hidden: false,
 	category: ''
+	,source: 'web'
 }
 
 export const useWriteStore = create<WriteStore>((set, get) => ({
@@ -196,6 +197,7 @@ export const useWriteStore = create<WriteStore>((set, get) => ({
 					summary: blog.config.summary || '',
 					hidden: blog.config.hidden || false,
 					category: blog.config.category || ''
+					,source: blog.config.source || 'web'
 				},
 				images,
 				cover,
