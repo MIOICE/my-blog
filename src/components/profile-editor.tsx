@@ -13,16 +13,19 @@ export default function ProfileEditor({ open, onClose }: { open:boolean; onClose
 	const [form,setForm] = useState<SiteContent>(siteContent)
 	const [avatar,setAvatar] = useState<FileItem|null>(null)
 	const [saving,setSaving] = useState(false)
+	const savingRef = useRef(false)
 	const keyRef = useRef<HTMLInputElement>(null)
 	useEffect(() => { if(open){setForm(structuredClone(siteContent));setAvatar(null)} },[open,siteContent])
 	if(!open) return null
 	const save = async () => {
+		if (savingRef.current) return
+		savingRef.current = true
 		setSaving(true)
 		try {
 			const next = avatar?.type === 'file' ? {...form,meta:{...form.meta,avatar:'/images/avatar.png'}} : form
 			await pushSiteContent(next,avatar)
 			setSiteContent(next); toast.success('个人资料已保存'); onClose()
-		} catch(e:any){toast.error(e?.message||'保存失败')} finally {setSaving(false)}
+		} catch(e:any){toast.error(e?.message||'保存失败')} finally {savingRef.current=false;setSaving(false)}
 	}
 	const chooseKey = async (file?:File) => { if(!file)return; setPrivateKey(await file.text()); await save() }
 	const updateSocial = (index:number,key:'label'|'value',value:string) => setForm({...form,socialButtons:form.socialButtons.map((item,i)=>i===index?{...item,[key]:value}:item)})
