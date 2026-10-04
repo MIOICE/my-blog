@@ -24,7 +24,6 @@ export const metadata: Metadata = {
 }
 
 const htmlStyle = {
-	cursor: 'url(/images/cursor.svg) 2 1, auto',
 	'--color-brand': theme.colorBrand,
 	'--color-primary': theme.colorPrimary,
 	'--color-secondary': theme.colorSecondary,
@@ -37,7 +36,7 @@ const htmlStyle = {
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
 	return (
-		<html lang='en' suppressHydrationWarning style={htmlStyle}>
+		<html lang='zh-CN' suppressHydrationWarning style={htmlStyle}>
 			<Head />
 
 			<body>

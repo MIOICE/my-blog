@@ -1,9 +1,9 @@
 .prose {
-	line-height: 1.8;
+	line-height: 1.95;
 	color: inherit;
 	word-break: break-word;
-	letter-spacing: 0.03em;
-	font-size: 15px;
+	letter-spacing: 0.025em;
+	font-size: 16px;
 	width: 100%;
 	overflow: hidden;
 }
@@ -12,51 +12,47 @@
 .prose h1,
 .prose h2,
 .prose h3 {
-	font-weight: 700;
-	line-height: 1.25;
-	margin-top: 2em;
-	margin-bottom: 1.5em;
+	font-weight: 600;
+	line-height: 1.4;
+	margin-top: 2.8em;
+	margin-bottom: 1.1em;
 
 	&::before {
-		content: '# ';
-		@apply text-brand/60;
+		content: '';
 	}
 }
 .prose h1 {
 	font-size: 1.75rem;
 }
 .prose h2 {
-	font-size: 1.25rem;
+	font-size: 1.35rem;
 }
 .prose h3 {
-	font-size: 1rem;
+	font-size: 1.08rem;
 	font-weight: 600;
 
 	&::before {
-		content: '## ';
-		@apply text-brand/60;
+		content: '';
 	}
 }
 .prose h4 {
 	font-size: 0.85rem;
 	font-weight: 500;
 	&::before {
-		content: '### ';
-		@apply text-brand/60;
+		content: '';
 	}
 }
 .prose h5 {
 	font-size: 0.75rem;
 	font-weight: 500;
 	&::before {
-		content: '#### ';
-		@apply text-brand/60;
+		content: '';
 	}
 }
 
 /* Paragraph */
 .prose p {
-	margin: 1.25em 0;
+	margin: 1.4em 0;
 }
 
 .prose strong {
@@ -177,8 +173,8 @@
 
 /* Images */
 .prose img {
-	max-width: 40%;
-	margin: 1.5em auto;
+	max-width: min(100%, 860px);
+	margin: 2.2em auto;
 	height: auto;
 	border-radius: 12px;
 	border: 1px solid rgba(0, 0, 0, 0.1);
@@ -188,11 +184,11 @@
 
 /* Blockquote */
 .prose blockquote {
-	border-left: 3px solid var(--color-brand);
-	background: rgba(0, 0, 0, 0.03);
-	margin: 1em 0;
-	padding: 0.75em 1em;
-	border-radius: 8px;
+	border-left: 2px solid color-mix(in srgb, var(--color-brand) 60%, transparent);
+	background: color-mix(in srgb, var(--color-brand) 5%, transparent);
+	margin: 2em 0;
+	padding: 0.9em 1.2em;
+	border-radius: 0 10px 10px 0;
 }
 
 /* HR */
