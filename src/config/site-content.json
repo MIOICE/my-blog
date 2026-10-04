@@ -22,6 +22,13 @@
 			"value": "/blog",
 			"label": "文章",
 			"order": 1
+		},
+		{
+			"id": "bb4b4cca-ef16-402f-a457-2ae3de37f75a",
+			"type": "link",
+			"value": "/introduce",
+			"label": "简介",
+			"order": 2
 		}
 	],
 	"isCachePem": false,
