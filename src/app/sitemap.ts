@@ -13,7 +13,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
 	console.log(`[Sitemap] Generating for: ${baseUrl}`)
 
-	let posts: BlogIndexItem[] = blogIndex
+	const posts = blogIndex as BlogIndexItem[]
 
 	const postEntries: MetadataRoute.Sitemap = posts.map(post => ({
 		url: `${baseUrl}/blog/${post.slug}`,
